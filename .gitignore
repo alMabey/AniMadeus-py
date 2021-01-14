@@ -1,0 +1,8 @@
+# Sensitive files
+config.py
+
+# VSCode files
+.vscode/
+
+# Virtual Env
+venv/
