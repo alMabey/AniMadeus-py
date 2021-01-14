@@ -12,4 +12,5 @@ need to copy to their machine from the server.
 
 ## Todo
 
-- Everything
+- Add website API commands (!events and !library)
+- Add webmaster command to create website members

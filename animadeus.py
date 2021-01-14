@@ -1,6 +1,8 @@
 import discord
 import config
 import mysql.connector
+import subprocess
+
 
 class AniMadeus(discord.Client):
 
@@ -28,7 +30,8 @@ class AniMadeus(discord.Client):
             'graduate': 729027220139409469,
             'minecraft': 758088431065759836,
             'webmaster' : 335157257346220033,
-            'member': 472915800081170452
+            'member': 472915800081170452,
+            'exec': 221311015432749056
         }
 
         self.emoji_to_role_mappings = {
@@ -86,15 +89,31 @@ class AniMadeus(discord.Client):
 
     async def on_message(self, message):
         if message.channel.id == self.channel_ids['bot-commands'] and message.content[0] == '!':
-            message_components = message.content.split(' ')
+            message_components = message.content.split()
             if message_components[0] == '!member':
                 await self.member_command(message, message_components)
+            elif message_components[0] == '!events':
+                return await message.channel.send('{0} - This command is not currently implemented.'.format(message.author.mention))
+            elif message_components[0] == '!library':
+                return await message.channel.send('{0} - This command is not currently implemented.'.format(message.author.mention))
             else:
                 return await message.channel.send('{0} - This command does not exist.'.format(message.author.mention))
 
+        if message.channel.id == self.channel_ids['web-development'] and message.content[0] == '!':
+            exec_role = self.get_guild(self.guild_id).get_role(self.role_ids['exec'])
+            if exec_role in message.author.roles:
+                message_components = message.content.split()
+                if message_components[0] == '!website_create_users':
+                    return await message.channel.send('{0} - This command is not currently implemented.'.format(message.author.mention))
+                else:
+                    return await message.channel.send('{0} - This command does not exist.'.format(message.author.mention))
+            else:
+                return await message.channel.send('{0} - Only exec can use these commands.'.format(message.author.mention))
+
+
     async def member_command(self, message, command_components):
         if len(command_components) != 2:
-            return await message.channel.send('{0} - You are using this command incorrectly. The correct format is `!member <uni_id>`.'.format(message.author.mention))
+            return await message.channel.send('{0} - You are using this command incorrectly. The correct usage is `!member <uni_id>`.'.format(message.author.mention))
 
         if len(command_components[1]) != 7:
             return await message.channel.send('{0} - Your university id should be 7 digits long.'.format(message.author.mention))
@@ -134,6 +153,16 @@ class AniMadeus(discord.Client):
             return await message.channel.send('{0} - The discord tag for this user does not match yours.'.format(message.author.mention))
         else:
             return await message.channel.send('{0} - No member with this ID was found.'.format(message.author.mention))
+
+    async def website_create_users_command(self, message, command_components):
+        if len(command_components) != 1:
+            return await message.channel.send('{0} - You are using this command incorrectly. The correct usage is `!website_create_users`.'.format(message.author.mention))
+        
+        process = subprocess.Popen(config.website_create_users_command.split(), stdout=subprocess.PIPE)
+        output, error = process.communicate()
+        print('o: {}'.format(output))
+        print('e: {}'.format(error))
+
 
 
 if __name__ == "__main__":
