@@ -105,7 +105,7 @@ class AniMadeus(discord.Client):
             return await message.channel.send('{0} - Your university id should be a 7 digit integer.'.format(message.author.mention))
 
         try:
-            conn = mysql.connector.connect(host=config.db_host, port=config.db_port, user=config.db_user, password=config.db_password)
+            conn = mysql.connector.connect(host=config.db_host, port=config.db_port, database=config.db_name, user=config.db_user, password=config.db_password)
         except mysql.connector.Error:
             await message.channel.send('{0} - An error occurred when running this command, please wait for the webmaster to fix it.'.format(message.author.mention))
             webmaster = message.guild.get_role(self.role_ids['webmaster'])
@@ -114,7 +114,7 @@ class AniMadeus(discord.Client):
 
         cursor = conn.cursor()
 
-        query = ('SELECT discord_tag FROM members_member INNER JOIN auth_user ON auth_user.id = members_member.id WHERE auth_user.username = {0}')
+        query = ('SELECT discord_tag FROM members_member INNER JOIN auth_user ON auth_user.id = members_member.user_id WHERE auth_user.username = %s')
 
         cursor.execute(query, (member_id,))
 
