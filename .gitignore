@@ -4,5 +4,8 @@ config.py
 # VSCode files
 .vscode/
 
+# Python cache files
+__pycache__/
+
 # Virtual Env
 venv/
