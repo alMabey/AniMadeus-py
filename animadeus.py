@@ -160,7 +160,7 @@ class AniMadeus(discord.Client):
         
         process = subprocess.Popen(config.website_create_users_command.split(), stdout=subprocess.PIPE)
         output, error = process.communicate()
-        return await message.channel.send('{0} - Command output: `{1}`.'.format(message.author.mention, output.decode('utf-8')))
+        return await message.channel.send('{0} - Command output: `{1}`.'.format(message.author.mention, output.decode('utf-8').strip('\n')))
 
 
 
