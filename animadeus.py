@@ -91,7 +91,7 @@ class AniMadeus(discord.Client):
         if message.channel.id == self.channel_ids['bot-commands'] and message.content[0] == '!':
             message_components = message.content.split()
             if message_components[0] == '!member':
-                await self.member_command(message, message_components)
+                return await self.member_command(message, message_components)
             elif message_components[0] == '!events':
                 return await message.channel.send('{0} - This command is not currently implemented.'.format(message.author.mention))
             elif message_components[0] == '!library':
@@ -104,7 +104,7 @@ class AniMadeus(discord.Client):
             if exec_role in message.author.roles:
                 message_components = message.content.split()
                 if message_components[0] == '!website_create_users':
-                    return await message.channel.send('{0} - This command is not currently implemented.'.format(message.author.mention))
+                    return await self.website_create_users_command(message, message_components)
                 else:
                     return await message.channel.send('{0} - This command does not exist.'.format(message.author.mention))
             else:
@@ -160,8 +160,7 @@ class AniMadeus(discord.Client):
         
         process = subprocess.Popen(config.website_create_users_command.split(), stdout=subprocess.PIPE)
         output, error = process.communicate()
-        print('o: {}'.format(output))
-        print('e: {}'.format(error))
+        return await message.channel.send('{0} - Command output: `{1}`.'.format(message.author.mention, output.decode('utf-8')))
 
 
 
