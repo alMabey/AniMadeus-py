@@ -10,5 +10,8 @@ __pycache__/
 # Nohup file
 nohup.out
 
+# File that stores pid of the txt
+pid.txt
+
 # Virtual Env
 venv/

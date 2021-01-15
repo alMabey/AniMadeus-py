@@ -45,6 +45,10 @@ class AniMadeus(discord.Client):
             '⛏️': self.role_ids['minecraft'],
         }
 
+
+    async def on_ready(self):
+        await self.change_presence(activity=config.status_activity)
+
     async def on_raw_reaction_add(self, payload):
         if payload.message_id != self.message_ids['role_assign_message']:
             return
@@ -110,7 +114,6 @@ class AniMadeus(discord.Client):
             else:
                 return await message.channel.send('{0} - Only exec can use these commands.'.format(message.author.mention))
 
-
     async def member_command(self, message, command_components):
         if len(command_components) != 2:
             return await message.channel.send('{0} - You are using this command incorrectly. The correct usage is `!member <uni_id>`.'.format(message.author.mention))
@@ -161,7 +164,6 @@ class AniMadeus(discord.Client):
         process = subprocess.Popen(config.website_create_users_command.split(), stdout=subprocess.PIPE)
         output, error = process.communicate()
         return await message.channel.send('{0} - Command output: `{1}`.'.format(message.author.mention, output.decode('utf-8').strip('\n')))
-
 
 
 if __name__ == "__main__":
