@@ -25,7 +25,6 @@ class AniMadeus(discord.Client):
         self.role_ids = {
             'general': 546855453603135489,
             'art': 602883577293832202,
-            'misc': 602883910753583154,
             'amq': 602883609057165363,
             'non-warwick': 729027269074485339,
             'vc': 730475391298568234,
@@ -39,7 +38,6 @@ class AniMadeus(discord.Client):
         self.emoji_to_role_mappings = {
             '1️⃣': self.role_ids['general'],
             '2️⃣': self.role_ids['art'],
-            '3️⃣': self.role_ids['misc'],
             '🎵': self.role_ids['amq'],
             '↖️': self.role_ids['non-warwick'],
             '🎙️': self.role_ids['vc'],
