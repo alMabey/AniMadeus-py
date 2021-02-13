@@ -30,7 +30,7 @@ class AniMadeus(discord.Client):
             'non-warwick': 729027269074485339,
             'vc': 730475391298568234,
             'graduate': 729027220139409469,
-            'minecraft': 758088431065759836,
+            'gacha_addict': 790246791320436796,
             'webmaster': 335157257346220033,
             'member': 472915800081170452,
             'exec': 221311015432749056
@@ -44,7 +44,7 @@ class AniMadeus(discord.Client):
             '↖️': self.role_ids['non-warwick'],
             '🎙️': self.role_ids['vc'],
             '🎓': self.role_ids['graduate'],
-            '⛏️': self.role_ids['minecraft'],
+            '🎰': self.role_ids['gacha_addict'],
         }
 
     # Method executed when the bot has started up.
