@@ -113,7 +113,11 @@ class AniMadeus(discord.Client):
                 return await message.channel.send('{0} - This command is not currently implemented.'.format(
                     message.author.mention))
             else:
-                return await message.channel.send('{0} - This command does not exist.'.format(message.author.mention))
+                pass
+                # Disabled line below to stop overlap when using NQN commands or commands by other bots that use the
+                # ! prefix
+
+                # return await message.channel.send('{0} - This command does not exist.'.format(message.author.mention))
 
         if message.channel.id == self.channel_ids['web-development'] and message.content[0] == '!':
             # Only members with the Exec role should be able to run these commands. As the command must also be sent in
