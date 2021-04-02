@@ -146,16 +146,14 @@ class AniMadeus(discord.Client):
                             return await message.channel.send('{0} - You are using this command incorrectly. The correct usage is `!prune <amount>`.'.format(
                                 message.author.mention))
                         if prune_count > 200:
-                            return await message.channel.send('{0} - You can only prune up to 200 messages at once.'.format(
+                            return await message.channel.send('{0} - You can only prune up to 100 messages at once.'.format(
                                 message.author.mention))
-                        async for delete_message in message.channel.history(limit=prune_count):
-                            await message.delete()
+                        deleted = await message.channel.purge(limit=prune_count)
                         return await message.channel.send('{0} - Pruned {1} messages.'.format(
-                            message.author.mention, prune_count))
+                            message.author.mention, len(deleted)), delete_after=3)
                     else:
                         return await message.channel.send('{0} - Only exec can use these commands.'.format(
                             message.author.mention))
-                
 
     # Method for handling the !member command
     async def member_command(self, message, command_components):
