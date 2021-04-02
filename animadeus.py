@@ -13,6 +13,8 @@ class AniMadeus(discord.Client):
 
         self.guild_id = 221309541088886784
 
+        self.command_prefix = '!'
+
         self.message_ids = {
             'role_assign_message': 751166772542963824,
         }
@@ -98,19 +100,19 @@ class AniMadeus(discord.Client):
     # Method executed when a message is sent in the server.
     # This is used for the various commands.
     async def on_message(self, message):
-        if message.content[0] == '!':
-            message_components = message.content.split()
+        if message.content[0] == self.command_prefix:
+            message_components = message.content[1:].split()
             # Commands for bot-commands
             if message.channel.id == self.channel_ids['bot-commands']:
-                if message_components[0] == '!member':
+                if message_components[0] == 'member':
                     # Command to add the "member" role to a user. Requires that they have linked their website account
                     # to their discord.
                     return await self.member_command(message, message_components)
-                elif message_components[0] == '!events':
+                elif message_components[0] == 'events':
                     # Command to return upcoming society events using the website's API.
                     return await message.channel.send('{0} - This command is not currently implemented.'.format(
                         message.author.mention))
-                elif message_components[0] == '!library':
+                elif message_components[0] == 'library':
                     # Command to search the society library using the website's API.
                     return await message.channel.send('{0} - This command is not currently implemented.'.format(
                         message.author.mention))
@@ -123,8 +125,7 @@ class AniMadeus(discord.Client):
                 # with the Admin role.
                 exec_role = self.get_guild(self.guild_id).get_role(self.role_ids['exec'])
                 if exec_role in message.author.roles:
-                    message_components = message.content.split()
-                    if message_components[0] == '!website_create_users':
+                    if message_components[0] == 'website_create_users':
                         # Command to run the createusers command on the website.
                         return await self.website_create_users_command(message, message_components)
                     else:
@@ -132,8 +133,29 @@ class AniMadeus(discord.Client):
                 else:
                     return await message.channel.send('{0} - Only exec can use these commands.'.format(
                         message.author.mention))
+            # Commands for all channels
             else:
-                pass
+                # Command to prune a certain amount of messages from the channel.
+                # Only members with the Exec role should be able to run this comand.
+                if message_components[0] == 'prune':
+                    exec_role = self.get_guild(self.guild_id).get_role(self.role_ids['exec'])
+                    if exec_role in message.author.roles:
+                        try:
+                            prune_count = int(message_components[1])
+                        except (ValueError, IndexError):
+                            return await message.channel.send('{0} - You are using this command incorrectly. The correct usage is `!prune <amount>`.'.format(
+                                message.author.mention))
+                        if prune_count > 200:
+                            return await message.channel.send('{0} - You can only prune up to 200 messages at once.'.format(
+                                message.author.mention))
+                        async for delete_message in message.channel.history(limit=prune_count):
+                            await message.delete()
+                        return await message.channel.send('{0} - Pruned {1} messages.'.format(
+                            message.author.mention, prune_count))
+                    else:
+                        return await message.channel.send('{0} - Only exec can use these commands.'.format(
+                            message.author.mention))
+                
 
     # Method for handling the !member command
     async def member_command(self, message, command_components):
