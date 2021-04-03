@@ -61,11 +61,18 @@ async def on_ready():
     await bot.change_presence(activity=config.status_activity)
 
 
+# Bot-commands check.
+#
+# Checks if a command was run in the bot-commands channel.
+def bot_commands_channel_check(ctx):
+    return ctx.message.channel.id == CHANNEL_IDS['web-commands']
+
+
 # Web-development check.
 #
 # Checks if a command was run in the web-development channel.
 def web_development_channel_check(ctx):
-    return ctx.message.channel.id == CHANNEL_IDS['web-development']
+    return ctx.message.channel.id == CHANNEL_IDS['bot-development']
 
 
 # Event listener for member joins.
@@ -148,6 +155,7 @@ async def on_raw_reaction_remove(payload):
 #
 # For this command to work the bot must be running on the same machine as the website's database.
 @bot.command(pass_context=True)
+@commands.check(bot_commands_channel_check)
 async def member(ctx, member_id: int):
     if len(str(member_id)) != 7:
         return await ctx.message.channel.send('{0} - Your university id should be 7 digits long.'.format(
@@ -207,7 +215,8 @@ async def on_member_error(ctx, error):
     elif isinstance(error, commands.errors.BadArgument):
         return await ctx.message.channel.send('{0} - Your university id should be a 7 digit integer.'.format(
             ctx.message.author.mention))
-
+    elif isinstance(error, commands.errors.CheckFailure):
+        pass
 
 # Create_website_user command.
 #
