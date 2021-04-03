@@ -1,243 +1,306 @@
 import discord
+from discord.ext import commands
 import config
 import mysql.connector
 import subprocess
 
 
-# Class for the bot client.
-class AniMadeus(discord.Client):
+# Global Data
+GUILD_ID = 221309541088886784
 
-    # Constructor for the AniMadeus class.
-    def __init__(self, *args, **kwargs) -> None:
-        super().__init__(*args, **kwargs)
+MESSAGE_IDS = {
+    'role_assign_message': 751166772542963824,
+}
 
-        self.guild_id = 221309541088886784
+CHANNEL_IDS = {
+    'bot-commands': 222363798391095296,
+    'web-development': 335158754616016906,
+    'newcomers': 753668259974217870,
+    'rules': 385333508463263746,
+    'role-assign': 546843849620979723,
+    'welcome-and-links': 326044428621840386
+}
 
-        self.command_prefix = '!'
+ROLE_IDS = {
+    'general': 546855453603135489,
+    'art': 602883577293832202,
+    'amq': 602883609057165363,
+    'non-warwick': 729027269074485339,
+    'vc': 730475391298568234,
+    'graduate': 729027220139409469,
+    'gacha_addict': 790246791320436796,
+    'webmaster': 335157257346220033,
+    'member': 472915800081170452,
+    'exec': 221311015432749056
+}
 
-        self.message_ids = {
-            'role_assign_message': 751166772542963824,
-        }
+EMOJI_TO_ROLE_MAPPINGS = {
+    '1️⃣': ROLE_IDS['general'],
+    '2️⃣': ROLE_IDS['art'],
+    '🎵': ROLE_IDS['amq'],
+    '↖️': ROLE_IDS['non-warwick'],
+    '🎙️': ROLE_IDS['vc'],
+    '🎓': ROLE_IDS['graduate'],
+    '🎰': ROLE_IDS['gacha_addict']
+}
 
-        self.channel_ids = {
-            'bot-commands': 222363798391095296,
-            'web-development': 335158754616016906
-        }
+# Intents
+intents = discord.Intents.default()
+intents.members = True
+intents.messages = True
 
-        self.role_ids = {
-            'general': 546855453603135489,
-            'art': 602883577293832202,
-            'amq': 602883609057165363,
-            'non-warwick': 729027269074485339,
-            'vc': 730475391298568234,
-            'graduate': 729027220139409469,
-            'gacha_addict': 790246791320436796,
-            'webmaster': 335157257346220033,
-            'member': 472915800081170452,
-            'exec': 221311015432749056
-        }
-
-        self.emoji_to_role_mappings = {
-            '1️⃣': self.role_ids['general'],
-            '2️⃣': self.role_ids['art'],
-            '🎵': self.role_ids['amq'],
-            '↖️': self.role_ids['non-warwick'],
-            '🎙️': self.role_ids['vc'],
-            '🎓': self.role_ids['graduate'],
-            '🎰': self.role_ids['gacha_addict'],
-        }
-
-    # Method executed when the bot has started up.
-    async def on_ready(self):
-        await self.change_presence(activity=config.status_activity)
-
-    # Method executed when a reaction is added to a message.
-    # This is used for the role assign system on the server.
-    async def on_raw_reaction_add(self, payload):
-        if payload.message_id != self.message_ids['role_assign_message']:
-            return
-
-        try:
-            # If we start using custom emoji this will need editing
-            role_id = self.emoji_to_role_mappings[str(payload.emoji)]
-        except KeyError:
-            return
-
-        role = self.get_guild(self.guild_id).get_role(role_id)
-        if role is None:
-            return
-
-        try:
-            await payload.member.add_roles(role)
-        except discord.HTTPException:
-            pass
-
-    # Method executed when a reaction is removed from a message.
-    # This is used for the role assign system on the server.
-    async def on_raw_reaction_remove(self, payload):
-        if payload.message_id != self.message_ids['role_assign_message']:
-            return
-
-        try:
-            # If we start using custom emoji this will need editing
-            role_id = self.emoji_to_role_mappings[str(payload.emoji)]
-        except KeyError:
-            return
-
-        role = self.get_guild(self.guild_id).get_role(role_id)
-        if role is None:
-            return
-
-        member = self.get_guild(self.guild_id).get_member(payload.user_id)
-        if member is None:
-            return
-
-        try:
-            await member.remove_roles(role)
-        except discord.HTTPException:
-            pass
-
-    # Method executed when a message is sent in the server.
-    # This is used for the various commands.
-    async def on_message(self, message):
-        if message.content[0] == self.command_prefix:
-            message_components = message.content[1:].split()
-            # Commands for bot-commands
-            if message.channel.id == self.channel_ids['bot-commands']:
-                if message_components[0] == 'member':
-                    # Command to add the "member" role to a user. Requires that they have linked their website account
-                    # to their discord.
-                    return await self.member_command(message, message_components)
-                elif message_components[0] == 'events':
-                    # Command to return upcoming society events using the website's API.
-                    return await message.channel.send('{0} - This command is not currently implemented.'.format(
-                        message.author.mention))
-                elif message_components[0] == 'library':
-                    # Command to search the society library using the website's API.
-                    return await message.channel.send('{0} - This command is not currently implemented.'.format(
-                        message.author.mention))
-                else:
-                    pass
-            # Commands for web-development
-            elif message.channel.id == self.channel_ids['web-development']:
-                # Only members with the Exec role should be able to run these commands. As the command must also be
-                # sent in the #web-development channel, this is limited to The Webmaster, The President and any exec
-                # with the Admin role.
-                exec_role = self.get_guild(self.guild_id).get_role(self.role_ids['exec'])
-                if exec_role in message.author.roles:
-                    if message_components[0] == 'website_create_users':
-                        # Command to run the createusers command on the website.
-                        return await self.website_create_users_command(message, message_components)
-                    else:
-                        pass
-                else:
-                    return await message.channel.send('{0} - Only exec can use these commands.'.format(
-                        message.author.mention))
-            # Commands for all channels
-            else:
-                # Command to prune a certain amount of messages from the channel.
-                # Only members with the Exec role should be able to run this comand.
-                if message_components[0] == 'prune':
-                    exec_role = self.get_guild(self.guild_id).get_role(self.role_ids['exec'])
-                    if exec_role in message.author.roles:
-                        try:
-                            prune_count = int(message_components[1])
-                        except (ValueError, IndexError):
-                            return await message.channel.send('{0} - You are using this command incorrectly. The correct usage is `!prune <amount>`.'.format(
-                                message.author.mention))
-                        if prune_count > 200:
-                            return await message.channel.send('{0} - You can only prune up to 100 messages at once.'.format(
-                                message.author.mention))
-                        deleted = await message.channel.purge(limit=prune_count)
-                        return await message.channel.send('{0} - Pruned {1} messages.'.format(
-                            message.author.mention, len(deleted)), delete_after=3)
-                    else:
-                        return await message.channel.send('{0} - Only exec can use these commands.'.format(
-                            message.author.mention))
-
-    # Method for handling the !member command
-    async def member_command(self, message, command_components):
-        if len(command_components) != 2:
-            return await message.channel.send(
-                '{0} - You are using this command incorrectly. The correct usage is `!member <uni_id>`.'.format(
-                    message.author.mention))
-
-        if len(command_components[1]) != 7:
-            return await message.channel.send('{0} - Your university id should be 7 digits long.'.format(
-                message.author.mention))
-
-        try:
-            member_id = int(command_components[1])
-        except ValueError:
-            return await message.channel.send('{0} - Your university id should be a 7 digit integer.'.format(
-                message.author.mention))
-
-        # As the bot runs on the same machine as the website, we can connect to the MySQL server that the site DB runs
-        # on to get the discord tag that matches the specified University ID. This is prefereable to using the site API
-        # as Uni ID to discord tag mappings may be considered sensitive by some, so having them on a public API is
-        # a bad idea.
-        try:
-            conn = mysql.connector.connect(
-                host=config.db_host,
-                port=config.db_port,
-                database=config.db_name,
-                user=config.db_user,
-                password=config.db_password)
-        except mysql.connector.Error:
-            await message.channel.send(
-                '{0} - An error occurred when running this command, please wait for the webmaster to fix it.'.format(
-                    message.author.mention))
-            webmaster = message.guild.get_role(self.role_ids['webmaster'])
-            web_development_channel = self.get_guild(self.guild_id).get_channel(self.channel_ids['web-development'])
-            return await web_development_channel.send(
-                '{0} - There was an SQL connection error when executing the member command.'.format(webmaster.mention))
-
-        cursor = conn.cursor()
-
-        query = 'SELECT discord_tag FROM members_member' \
-            ' INNER JOIN auth_user ON auth_user.id = members_member.user_id' \
-            ' WHERE auth_user.username = %s;'
-
-        cursor.execute(query, (member_id,))
-
-        tag_matched = False
-        result_found = False
-        for (discord_tag,) in cursor:
-            result_found = True
-            tag_matched = discord_tag == '{0}#{1}'.format(message.author.name, message.author.discriminator)
-
-        conn.close()
-
-        if tag_matched:
-            member_role = self.get_guild(self.guild_id).get_role(self.role_ids['member'])
-            await message.author.add_roles(member_role)
-            return await message.channel.send('{0} - Member role added.'.format(message.author.mention))
-        elif result_found:
-            return await message.channel.send('{0} - The discord tag for this user does not match yours.'.format(
-                message.author.mention))
-        else:
-            return await message.channel.send('{0} - No member with this ID was found.'.format(message.author.mention))
-
-    # Method for handling the !website_create_users command
-    async def website_create_users_command(self, message, command_components):
-        if len(command_components) != 1:
-            return await message.channel.send(
-                '{0} - You are using this command incorrectly. The correct usage is `!website_create_users`.'.format(
-                    message.author.mention))
-
-        # The command needs to be run from the TengenToppaAniMango venv, so we use the subprocess module to execute it.
-        process = subprocess.Popen(config.website_create_users_command.split(), stdout=subprocess.PIPE)
-        # The command will either print the number of new members or the error that occurred when trying to make the
-        # accounts.
-        output, error = process.communicate()
-        return await message.channel.send('{0} - Command output: `{1}`.'.format(
-            message.author.mention, output.decode('utf-8').strip('\n')))
+# Bot instance
+bot = commands.Bot(command_prefix='!', description='The Warwick Anime & Manga Society Discor Bot.', intents=intents)
 
 
-if __name__ == "__main__":
-    intents = discord.Intents.default()
-    intents.members = True
-    intents.messages = True
+# Web-development check.
+#
+# Checks if a command was run in the web-development channel.
+def web_development_channel_check(ctx):
+    return ctx.message.channel.id == CHANNEL_IDS['web-development']
 
-    client = AniMadeus(intents=intents)
-    client.run(config.bot_token)
+
+# Event listener for member joins.
+#
+# Used to welcome new users.
+@bot.listen()
+async def on_member_join(member):
+    guild = bot.get_guild(GUILD_ID)
+    newcomers_channel = guild.get_channel(CHANNEL_IDS['newcomers'])
+    welcome_channel = guild.get_channel(CHANNEL_IDS['welcome-and-links'])
+    rules_channel = guild.get_channel(CHANNEL_IDS['rules'])
+    role_channel = guild.get_channel(CHANNEL_IDS['role-assign'])
+    welcome_string = ('Welcome to the Warwick Anime and Manga Society Discord serever, {0}!'
+                      ' Please see {1} and {2} for information about the society and this server.'
+                      'To gain access to the rest of the server please react to the message in {3}!')
+    await newcomers_channel.send(
+        welcome_string.format(member.mention, welcome_channel.mention, rules_channel.mention, role_channel.mention))
+
+
+# Event listener for reaction adds.
+#
+# Used for the role assign system.
+@bot.listen()
+async def on_raw_reaction_add(payload):
+    if payload.message_id != MESSAGE_IDS['role_assign_message']:
+        return
+
+    try:
+        # If we start using custom emoji this will need editing
+        role_id = EMOJI_TO_ROLE_MAPPINGS[str(payload.emoji)]
+    except KeyError:
+        return
+
+    role = bot.get_guild(GUILD_ID).get_role(role_id)
+    if role is None:
+        return
+
+    try:
+        await payload.member.add_roles(role)
+    except discord.HTTPException:
+        pass
+
+
+# Event listener for reaction removals.
+#
+# Used for the role assign system.
+@bot.listen()
+async def on_raw_reaction_remove(payload):
+    if payload.message_id != MESSAGE_IDS['role_assign_message']:
+        return
+
+    try:
+        # If we start using custom emoji this will need editing
+        role_id = EMOJI_TO_ROLE_MAPPINGS[str(payload.emoji)]
+    except KeyError:
+        return
+
+    role = bot.get_guild(GUILD_ID).get_role(role_id)
+    if role is None:
+        return
+
+    member = bot.get_guild(GUILD_ID).get_member(payload.user_id)
+    if member is None:
+        return
+
+    try:
+        await member.remove_roles(role)
+    except discord.HTTPException:
+        pass
+
+
+# Member command.
+#
+# Used to assign users the Member role.
+#
+# The member role is assigned to users that have linked their website (animesoc.co.uk) account with their discord.
+# The current website API is barebones and lacks any form of authentication. Discord tag to member's website accounts
+# could be considered sensitive by some. So to avoid needing to implement authentication on the API the bot connects
+# to the MYSQL server that contains the site's database to find the discord tag.
+#
+# For this command to work the bot must be running on the same machine as the website's database.
+@bot.command(pass_context=True)
+async def member(ctx, member_id: int):
+    if len(str(member_id)) != 7:
+        return await ctx.message.channel.send('{0} - Your university id should be 7 digits long.'.format(
+            ctx.message.author.mention))
+
+    try:
+        conn = mysql.connector.connect(
+            host=config.db_host,
+            port=config.db_port,
+            database=config.db_name,
+            user=config.db_user,
+            password=config.db_password)
+    except mysql.connector.Error:
+        await ctx.message.channel.send(
+            '{0} - An error occurred when running this command, please wait for the webmaster to fix it.'.format(
+                ctx.message.author.mention))
+        webmaster = ctx.message.guild.get_role(ROLE_IDS['webmaster'])
+        web_development_channel = bot.get_guild(GUILD_ID).get_channel(CHANNEL_IDS['web-development'])
+        return await web_development_channel.send(
+            '{0} - There was an SQL connection error when executing the member command.'.format(webmaster.mention))
+
+    cursor = conn.cursor()
+
+    query = 'SELECT discord_tag FROM members_member' \
+        ' INNER JOIN auth_user ON auth_user.id = members_member.user_id' \
+        ' WHERE auth_user.username = %s;'
+
+    cursor.execute(query, (member_id,))
+
+    tag_matched = False
+    result_found = False
+    for (discord_tag,) in cursor:
+        result_found = True
+        tag_matched = discord_tag == '{0}#{1}'.format(ctx.message.author.name, ctx.message.author.discriminator)
+
+    conn.close()
+
+    if tag_matched:
+        member_role = bot.get_guild(GUILD_ID).get_role(ROLE_IDS['member'])
+        await ctx.message.author.add_roles(member_role)
+        return await ctx.message.channel.send('{0} - Member role added.'.format(ctx.message.author.mention))
+    elif result_found:
+        return await ctx.message.channel.send('{0} - The discord tag for this user does not match yours.'.format(
+            ctx.message.author.mention))
+    else:
+        return await ctx.message.channel.send('{0} - No member with this ID was found.'.format(
+            ctx.message.author.mention))
+
+
+# Member command error handler.
+@member.error
+async def on_member_error(ctx, error):
+    if isinstance(error, commands.errors.MissingRequiredArgument):
+        return await ctx.message.channel.send(
+            '{0} - You are using this command incorrectly. The correct usage is `!member <uni_id>`.'.format(
+                ctx.message.author.mention))
+    elif isinstance(error, commands.errors.BadArgument):
+        return await ctx.message.channel.send('{0} - Your university id should be a 7 digit integer.'.format(
+            ctx.message.author.mention))
+
+
+# Create_website_user command.
+#
+# Run the command to create users on the website.
+#
+# This command uses the subprocesses module to run the command which creates users on the website and sends out the
+# welcome emails.
+#
+# Only the webmaster can use this command and it must be in the web-development channel.
+#
+# For this command to work the bot must be running on the same machine as the website.
+@bot.command(pass_context=True)
+@commands.has_role(ROLE_IDS['webmaster'])
+@commands.check(web_development_channel_check)
+async def website_create_users(ctx):
+    process = subprocess.Popen(config.website_create_users_command.split(), stdout=subprocess.PIPE)
+    # The command will either print the number of new members or the error that occurred when trying to make the
+    # accounts.
+    output, _ = process.communicate()
+    return await ctx.message.channel.send('{0} - Command output: `{1}`.'.format(
+        ctx.message.author.mention, output.decode('utf-8').strip('\n')))
+
+
+# Create_website_user command error handler.
+@website_create_users.error
+async def on_website_create_users_error(ctx, error):
+    if isinstance(error, commands.errors.MissingRole):
+        return await ctx.message.channel.send(
+            '{0} - Only the webmaster can use this command.'.format(
+                ctx.message.author.mention))
+    elif isinstance(error, commands.errors.CheckFailure):
+        return await ctx.message.channel.send('{0} - You must use this command in the web-development channel.'.format(
+            ctx.message.author.mention))
+
+
+# Prune command.
+#
+# Prunes up to 100 messages.
+#
+# Only exec can use this command.
+@bot.command()
+@commands.has_role(ROLE_IDS['exec'])
+async def prune(ctx, prune_amount: int):
+    if prune_amount > 100:
+        return await ctx.message.channel.send(
+            '{0} - You can only prune up to 100 messages at once.'.format(
+                ctx.message.author.mention))
+    elif prune_amount < 0:
+        return await ctx.message.channel.send(
+            '{0} - The amount of messages to prune must be a postive integer.'.format(
+                ctx.message.author.mention))
+
+    deleted = await ctx.message.channel.purge(limit=prune_amount)
+    return await ctx.message.channel.send('{0} - Pruned {1} messages.'.format(
+        ctx.message.author.mention, len(deleted)), delete_after=5)
+
+
+# Prune command error handler.
+@prune.error
+async def on_prune_error(ctx, error):
+    if isinstance(error, commands.errors.MissingRole):
+        return await ctx.message.channel.send(
+            '{0} - Only the exec can use this command.'.format(
+                ctx.message.author.mention))
+    elif isinstance(error, commands.errors.MissingRequiredArgument):
+        return await ctx.message.channel.send(
+            '{0} - You are using this command incorrectly. The correct usage is `!prune <amount>`.'.format(
+                ctx.message.author.mention))
+    elif isinstance(error, commands.errors.BadArgument):
+        return await ctx.message.channel.send(
+            '{0} - The amount of messages to prune must be a postive integer.'.format(
+                ctx.message.author.mention))
+
+
+# Events command.
+#
+# Returns a formatted list of upcoming events.
+#
+# This command was implemented in the old Animadeus bot, however no one ever really used it so this is a very low
+# priority feature.
+@bot.command(pass_context=True)
+async def events(ctx):
+    message_string = ('{0} - This command is not currently implemented'
+                      ' ~~and probably wont be for a very long time~~.')
+    return await ctx.message.channel.send(message_string.format(
+        ctx.message.author.mention))
+
+
+# Library command.
+#
+# Returns a formatted list of library titles that match a search string.
+#
+# This command was implemented in the old Animadeus bot, however no one ever really used it so this is a very low
+# priority feature.
+@bot.command(pass_context=True)
+async def library(ctx):
+    message_string = ('{0} - This command is not currently implemented'
+                      ' ~~and probably wont be for a very long time~~.')
+    return await ctx.message.channel.send(message_string.format(
+        ctx.message.author.mention))
+
+
+if __name__ == '__main__':
+    bot.run(config.bot_token)
