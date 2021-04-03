@@ -171,9 +171,9 @@ async def member(ctx, member_id: int):
 
     cursor = conn.cursor()
 
-    query = 'SELECT discord_tag FROM members_member' \
-        ' INNER JOIN auth_user ON auth_user.id = members_member.user_id' \
-        ' WHERE auth_user.username = %s;'
+    query = ('SELECT discord_tag FROM members_member'
+             ' INNER JOIN auth_user ON auth_user.id = members_member.user_id'
+             ' WHERE auth_user.username = %s;')
 
     cursor.execute(query, (member_id,))
 
