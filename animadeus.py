@@ -53,6 +53,14 @@ intents.messages = True
 bot = commands.Bot(command_prefix='!', description='The Warwick Anime & Manga Society Discor Bot.', intents=intents)
 
 
+# Startup event.
+#
+# Currently only sets the status.
+@bot.event
+async def on_ready():
+    await bot.change_presence(activity=config.status_activity)
+
+
 # Web-development check.
 #
 # Checks if a command was run in the web-development channel.
