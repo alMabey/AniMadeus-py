@@ -65,14 +65,14 @@ async def on_ready():
 #
 # Checks if a command was run in the bot-commands channel.
 def bot_commands_channel_check(ctx):
-    return ctx.message.channel.id == CHANNEL_IDS['web-commands']
+    return ctx.message.channel.id == CHANNEL_IDS['bot-commands']
 
 
 # Web-development check.
 #
 # Checks if a command was run in the web-development channel.
 def web_development_channel_check(ctx):
-    return ctx.message.channel.id == CHANNEL_IDS['bot-development']
+    return ctx.message.channel.id == CHANNEL_IDS['web-development']
 
 
 # Event listener for member joins.
