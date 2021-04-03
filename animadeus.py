@@ -218,6 +218,7 @@ async def on_member_error(ctx, error):
     elif isinstance(error, commands.errors.CheckFailure):
         pass
 
+
 # Create_website_user command.
 #
 # Run the command to create users on the website.
