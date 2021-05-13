@@ -85,7 +85,7 @@ async def on_member_join(member):
     welcome_channel = guild.get_channel(CHANNEL_IDS['welcome-and-links'])
     rules_channel = guild.get_channel(CHANNEL_IDS['rules'])
     role_channel = guild.get_channel(CHANNEL_IDS['role-assign'])
-    welcome_string = ('Welcome to the Warwick Anime and Manga Society Discord serever, {0}!'
+    welcome_string = ('Welcome to the Warwick Anime and Manga Society Discord server, {0}!'
                       ' Please see {1} and {2} for information about the society and this server.'
                       ' To gain access to the rest of the server please react to the message in {3}!')
     await newcomers_channel.send(
