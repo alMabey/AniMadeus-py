@@ -18,7 +18,8 @@ CHANNEL_IDS = {
     'newcomers': 753668259974217870,
     'rules': 385333508463263746,
     'role-assign': 546843849620979723,
-    'welcome-and-links': 326044428621840386
+    'welcome-and-links': 326044428621840386,
+    'off-topic': 391359642539917322
 }
 
 ROLE_IDS = {
@@ -142,6 +143,33 @@ async def on_raw_reaction_remove(payload):
         await member.remove_roles(role)
     except discord.HTTPException:
         pass
+
+
+# Event listener for ngmi_check.
+#
+# Used for Porkying.
+# > ok so whenever waifu, figure, simp, ship, nitro, handhold, japan are mentioned, the bot must reply ngmi
+# t. High Priest of Eris
+@bot.listen()
+async def ngmi_check(message):
+
+    ngmi_strings = [
+        'waifu',
+        'figure',
+        'simp',
+        'ship',
+        'nitro',
+        'handhold',
+        'japan'
+    ]
+
+    if message.channel.id == CHANNEL_IDS['off-topic']:
+        if any(ngmi_string in message.content.lower() for ngmi_string in ngmi_strings):
+
+            author = message.author.id
+            ngmi_string = 'ngmi, {}.'
+
+            await message.channel.send(ngmi_string.format(author.mention))
 
 
 # Member command.
