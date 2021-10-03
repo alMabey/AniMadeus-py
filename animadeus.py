@@ -46,14 +46,14 @@ EMOJI_TO_ROLE_MAPPINGS = {
 }
 
 NGMI_STRINGS = [
-        'waifu',
-        'figure',
-        'simp',
-        'ship',
-        'nitro',
-        'handhold',
-        'japan',
-        'uwu'
+    'waifu',
+    'figure',
+    'simp',
+    'ship',
+    'nitro',
+    'handhold',
+    'japan',
+    'uwu'
 ]
 
 # Intents
