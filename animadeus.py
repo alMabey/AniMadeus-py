@@ -45,6 +45,17 @@ EMOJI_TO_ROLE_MAPPINGS = {
     '🎰': ROLE_IDS['gacha_addict']
 }
 
+NGMI_STRINGS = [
+        'waifu',
+        'figure',
+        'simp',
+        'ship',
+        'nitro',
+        'handhold',
+        'japan',
+        'uwu'
+]
+
 # Intents
 intents = discord.Intents.default()
 intents.members = True
@@ -144,32 +155,6 @@ async def on_raw_reaction_remove(payload):
     except discord.HTTPException:
         pass
 
-
-# Event listener for ngmi_check.
-#
-# Used for Porkying.
-# > ok so whenever waifu, figure, simp, ship, nitro, handhold, japan are mentioned, the bot must reply ngmi
-# t. High Priest of Eris
-@bot.listen()
-async def ngmi_check(message):
-
-    ngmi_strings = [
-        'waifu',
-        'figure',
-        'simp',
-        'ship',
-        'nitro',
-        'handhold',
-        'japan'
-    ]
-
-    if message.channel.id == CHANNEL_IDS['off-topic']:
-        if any(ngmi_string in message.content.lower() for ngmi_string in ngmi_strings):
-
-            author = message.author.id
-            ngmi_string = 'ngmi, {}.'
-
-            await message.channel.send(ngmi_string.format(author.mention))
 
 
 # Member command.
@@ -348,5 +333,18 @@ async def library(ctx):
         ctx.message.author.mention))
 
 
+# Event listener for ngmi messages.
+#
+# Used for Porkying.
+# > ok so whenever waifu, figure, simp, ship, nitro, handhold, japan are mentioned, the bot must reply ngmi
+# t. High Priest of Eris
+@bot.listen()
+async def on_message(message):
+    if message.channel.id == CHANNEL_IDS['off-topic']:
+        if any(keyword in message.content.lower() for keyword in NGMI_STRINGS):
+            await message.channel.send('ngmi, {0}'.format(message.author.id.mention))
+
+
 if __name__ == '__main__':
     bot.run(config.bot_token)
+
