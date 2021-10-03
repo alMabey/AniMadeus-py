@@ -338,13 +338,12 @@ async def library(ctx):
 # Used for Porkying.
 # > ok so whenever waifu, figure, simp, ship, nitro, handhold, japan are mentioned, the bot must reply ngmi
 # t. High Priest of Eris
-@bot.listen()
-async def on_message(message):
+@bot.listen('on_message')
+async def ngmi_check(message):
     if message.channel.id == CHANNEL_IDS['off-topic']:
         if any(keyword in message.content.lower() for keyword in NGMI_STRINGS):
-            await message.channel.send('ngmi, {0}'.format(message.author.id.mention))
+            await message.channel.send('ngmi, {0}'.format(message.author.mention))
 
 
 if __name__ == '__main__':
     bot.run(config.bot_token)
-
