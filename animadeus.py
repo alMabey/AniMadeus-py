@@ -18,6 +18,7 @@ intents.messages = True
 # Bot instance
 bot = commands.Bot(command_prefix='!', description='The Warwick Anime & Manga Society Discord Bot.', intents=intents)
 
+
 # Startup event.
 #
 # Currently only sets the status.
@@ -107,7 +108,6 @@ async def on_raw_reaction_remove(payload):
         await member.remove_roles(role)
     except discord.HTTPException:
         pass
-
 
 
 # Member command.
