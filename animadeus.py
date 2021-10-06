@@ -3,7 +3,7 @@ from discord.ext import commands
 import config
 import mysql.connector
 import subprocess
-
+import re
 
 # Global Data
 GUILD_ID = 221309541088886784
@@ -45,16 +45,8 @@ EMOJI_TO_ROLE_MAPPINGS = {
     '🎰': ROLE_IDS['gacha_addict']
 }
 
-NGMI_STRINGS = [
-    'waifu',
-    'figure',
-    'simp',
-    'ship',
-    'nitro',
-    'handhold',
-    'japan',
-    'uwu'
-]
+NGMI_EXPR = re.compile(r'\b(?:waifu|figure|simp|ship|nitro|handholding|japan|uwu)\b')
+
 
 # Intents
 intents = discord.Intents.default()
@@ -341,7 +333,7 @@ async def library(ctx):
 @bot.listen('on_message')
 async def ngmi_check(message):
     if message.channel.id == CHANNEL_IDS['off-topic']:
-        if any(keyword in message.content.lower() for keyword in NGMI_STRINGS):
+        if re.search(NGMI_EXPR, message.content, re.IGNORECASE):
             await message.channel.send('ngmi, {0}'.format(message.author.mention))
 
 
