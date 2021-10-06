@@ -16,7 +16,7 @@ intents.members = True
 intents.messages = True
 
 # Bot instance
-bot = commands.Bot(command_prefix='!', description='The Warwick Anime & Manga Society Discor Bot.', intents=intents)
+bot = commands.Bot(command_prefix='!', description='The Warwick Anime & Manga Society Discord Bot.', intents=intents)
 
 # Startup event.
 #
