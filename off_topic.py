@@ -5,6 +5,7 @@ import bot_data
 import discord
 from discord.ext import commands
 import re
+import random
 
 
 NGMI_STRINGS = [
@@ -52,3 +53,13 @@ class OffTopicCog(commands.Cog):
         if message.channel.id == bot_data.CHANNEL_IDS['off-topic']:
             if message.content in CHAIN_MESSAGES and not message.author.bot:
                 await message.channel.send(message.content)
+
+    # Bravo Nolan command.
+    #
+    # Quotes kino.
+    @commands.command(pass_context=True)
+    async def bravonolan(self, ctx):
+        quote = ''
+        while quote == '':
+            quote = random.choice((open("./data/bravonolan.txt").readlines()))
+        await ctx.reply(quote)
