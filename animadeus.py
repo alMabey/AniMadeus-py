@@ -1,51 +1,13 @@
+# AniMadeus main file
+import bot_data
+import config
+from off_topic import OffTopicCog
+
+
 import discord
 from discord.ext import commands
-import config
 import mysql.connector
 import subprocess
-import re
-
-# Global Data
-GUILD_ID = 221309541088886784
-
-MESSAGE_IDS = {
-    'role_assign_message': 751166772542963824,
-}
-
-CHANNEL_IDS = {
-    'bot-commands': 222363798391095296,
-    'web-development': 335158754616016906,
-    'newcomers': 753668259974217870,
-    'rules': 385333508463263746,
-    'role-assign': 546843849620979723,
-    'welcome-and-links': 326044428621840386,
-    'off-topic': 391359642539917322
-}
-
-ROLE_IDS = {
-    'general': 546855453603135489,
-    'art': 602883577293832202,
-    'amq': 602883609057165363,
-    'non-warwick': 729027269074485339,
-    'vc': 730475391298568234,
-    'graduate': 729027220139409469,
-    'gacha_addict': 790246791320436796,
-    'webmaster': 335157257346220033,
-    'member': 472915800081170452,
-    'exec': 221311015432749056
-}
-
-EMOJI_TO_ROLE_MAPPINGS = {
-    '1️⃣': ROLE_IDS['general'],
-    '2️⃣': ROLE_IDS['art'],
-    '🎵': ROLE_IDS['amq'],
-    '↖️': ROLE_IDS['non-warwick'],
-    '🎙️': ROLE_IDS['vc'],
-    '🎓': ROLE_IDS['graduate'],
-    '🎰': ROLE_IDS['gacha_addict']
-}
-
-NGMI_EXPR = re.compile(r'\b(?:waifu|figure|simp|ship|nitro|handholding|japan|uwu)\b')
 
 
 # Intents
@@ -55,7 +17,6 @@ intents.messages = True
 
 # Bot instance
 bot = commands.Bot(command_prefix='!', description='The Warwick Anime & Manga Society Discor Bot.', intents=intents)
-
 
 # Startup event.
 #
@@ -69,14 +30,14 @@ async def on_ready():
 #
 # Checks if a command was run in the bot-commands channel.
 def bot_commands_channel_check(ctx):
-    return ctx.message.channel.id == CHANNEL_IDS['bot-commands']
+    return ctx.message.channel.id == bot_data.CHANNEL_IDS['bot-commands']
 
 
 # Web-development check.
 #
 # Checks if a command was run in the web-development channel.
 def web_development_channel_check(ctx):
-    return ctx.message.channel.id == CHANNEL_IDS['web-development']
+    return ctx.message.channel.id == bot_data.CHANNEL_IDS['web-development']
 
 
 # Event listener for member joins.
@@ -84,11 +45,11 @@ def web_development_channel_check(ctx):
 # Used to welcome new users.
 @bot.listen()
 async def on_member_join(member):
-    guild = bot.get_guild(GUILD_ID)
-    newcomers_channel = guild.get_channel(CHANNEL_IDS['newcomers'])
-    welcome_channel = guild.get_channel(CHANNEL_IDS['welcome-and-links'])
-    rules_channel = guild.get_channel(CHANNEL_IDS['rules'])
-    role_channel = guild.get_channel(CHANNEL_IDS['role-assign'])
+    guild = bot.get_guild(bot_data.GUILD_ID)
+    newcomers_channel = guild.get_channel(bot_data.CHANNEL_IDS['newcomers'])
+    welcome_channel = guild.get_channel(bot_data.CHANNEL_IDS['welcome-and-links'])
+    rules_channel = guild.get_channel(bot_data.CHANNEL_IDS['rules'])
+    role_channel = guild.get_channel(bot_data.CHANNEL_IDS['role-assign'])
     welcome_string = ('Welcome to the Warwick Anime and Manga Society Discord server, {0}!'
                       ' Please see {1} and {2} for information about the society and this server.'
                       ' To gain access to the rest of the server please react to the message in {3}!')
@@ -101,16 +62,16 @@ async def on_member_join(member):
 # Used for the role assign system.
 @bot.listen()
 async def on_raw_reaction_add(payload):
-    if payload.message_id != MESSAGE_IDS['role_assign_message']:
+    if payload.message_id != bot_data.MESSAGE_IDS['role_assign_message']:
         return
 
     try:
         # If we start using custom emoji this will need editing
-        role_id = EMOJI_TO_ROLE_MAPPINGS[str(payload.emoji)]
+        role_id = bot_data.EMOJI_TO_ROLE_MAPPINGS[str(payload.emoji)]
     except KeyError:
         return
 
-    role = bot.get_guild(GUILD_ID).get_role(role_id)
+    role = bot.get_guild(bot_data.GUILD_ID).get_role(role_id)
     if role is None:
         return
 
@@ -125,20 +86,20 @@ async def on_raw_reaction_add(payload):
 # Used for the role assign system.
 @bot.listen()
 async def on_raw_reaction_remove(payload):
-    if payload.message_id != MESSAGE_IDS['role_assign_message']:
+    if payload.message_id != bot_data.MESSAGE_IDS['role_assign_message']:
         return
 
     try:
         # If we start using custom emoji this will need editing
-        role_id = EMOJI_TO_ROLE_MAPPINGS[str(payload.emoji)]
+        role_id = bot_data.EMOJI_TO_ROLE_MAPPINGS[str(payload.emoji)]
     except KeyError:
         return
 
-    role = bot.get_guild(GUILD_ID).get_role(role_id)
+    role = bot.get_guild(bot_data.GUILD_ID).get_role(role_id)
     if role is None:
         return
 
-    member = bot.get_guild(GUILD_ID).get_member(payload.user_id)
+    member = bot.get_guild(bot_data.GUILD_ID).get_member(payload.user_id)
     if member is None:
         return
 
@@ -177,8 +138,8 @@ async def member(ctx, member_id: int):
         await ctx.message.channel.send(
             '{0} - An error occurred when running this command, please wait for the webmaster to fix it.'.format(
                 ctx.message.author.mention))
-        webmaster = ctx.message.guild.get_role(ROLE_IDS['webmaster'])
-        web_development_channel = bot.get_guild(GUILD_ID).get_channel(CHANNEL_IDS['web-development'])
+        webmaster = ctx.message.guild.get_role(bot_data.ROLE_IDS['webmaster'])
+        web_development_channel = bot.get_guild(bot_data.GUILD_ID).get_channel(bot_data.CHANNEL_IDS['web-development'])
         return await web_development_channel.send(
             '{0} - There was an SQL connection error when executing the member command.'.format(webmaster.mention))
 
@@ -199,7 +160,7 @@ async def member(ctx, member_id: int):
     conn.close()
 
     if tag_matched:
-        member_role = bot.get_guild(GUILD_ID).get_role(ROLE_IDS['member'])
+        member_role = bot.get_guild(bot_data.GUILD_ID).get_role(bot_data.ROLE_IDS['member'])
         await ctx.message.author.add_roles(member_role)
         return await ctx.message.channel.send('{0} - Member role added.'.format(ctx.message.author.mention))
     elif result_found:
@@ -235,7 +196,7 @@ async def on_member_error(ctx, error):
 #
 # For this command to work the bot must be running on the same machine as the website.
 @bot.command(pass_context=True)
-@commands.has_role(ROLE_IDS['webmaster'])
+@commands.has_role(bot_data.ROLE_IDS['webmaster'])
 @commands.check(web_development_channel_check)
 async def website_create_users(ctx):
     process = subprocess.Popen(config.website_create_users_command.split(), stdout=subprocess.PIPE)
@@ -264,7 +225,7 @@ async def on_website_create_users_error(ctx, error):
 #
 # Only exec can use this command.
 @bot.command()
-@commands.has_role(ROLE_IDS['exec'])
+@commands.has_role(bot_data.ROLE_IDS['exec'])
 async def prune(ctx, prune_amount: int):
     if prune_amount > 100:
         return await ctx.message.channel.send(
@@ -325,17 +286,6 @@ async def library(ctx):
         ctx.message.author.mention))
 
 
-# Event listener for ngmi messages.
-#
-# Used for Porkying.
-# > ok so whenever waifu, figure, simp, ship, nitro, handhold, japan are mentioned, the bot must reply ngmi
-# t. High Priest of Eris
-@bot.listen('on_message')
-async def ngmi_check(message):
-    if message.channel.id == CHANNEL_IDS['off-topic']:
-        if re.search(NGMI_EXPR, message.content, re.IGNORECASE):
-            await message.channel.send('ngmi, {0}'.format(message.author.mention))
-
-
 if __name__ == '__main__':
+    bot.add_cog(OffTopicCog(bot))
     bot.run(config.bot_token)
