@@ -7,7 +7,7 @@ GUILD_ID = 221309541088886784
 
 MESSAGE_IDS = {
     'role_assign_message': 751166772542963824,
-    'mcm_message': 901224605535068210  # TEMP
+    'mcm_message': 901227550129393704  # TEMP
 }
 
 CHANNEL_IDS = {
