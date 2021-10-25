@@ -7,7 +7,6 @@ GUILD_ID = 221309541088886784
 
 MESSAGE_IDS = {
     'role_assign_message': 751166772542963824,
-    'mcm_message': 901227550129393704  # TEMP
 }
 
 CHANNEL_IDS = {
@@ -31,7 +30,6 @@ ROLE_IDS = {
     'webmaster': 335157257346220033,
     'member': 472915800081170452,
     'exec': 221311015432749056,
-    'mcm': 901224845067583550  # TEMP
 }
 
 EMOJI_TO_ROLE_MAPPINGS = {
@@ -42,5 +40,4 @@ EMOJI_TO_ROLE_MAPPINGS = {
     '🎙️': ROLE_IDS['vc'],
     '🎓': ROLE_IDS['graduate'],
     '🎰': ROLE_IDS['gacha_addict'],
-    '🚄': ROLE_IDS['mcm']  # TEMP
 }

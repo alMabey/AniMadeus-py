@@ -63,22 +63,6 @@ async def on_member_join(member):
 # Used for the role assign system.
 @bot.listen()
 async def on_raw_reaction_add(payload):
-    if payload.message_id == bot_data.MESSAGE_IDS['mcm_message']:
-        try:
-            # If we start using custom emoji this will need editing
-            role_id = bot_data.EMOJI_TO_ROLE_MAPPINGS[str(payload.emoji)]
-        except KeyError:
-            return
-
-        role = bot.get_guild(bot_data.GUILD_ID).get_role(role_id)
-        if role is None:
-            return
-
-        try:
-            await payload.member.add_roles(role)
-        except discord.HTTPException:
-            pass  
-
     if payload.message_id != bot_data.MESSAGE_IDS['role_assign_message']:
         return
 
