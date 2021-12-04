@@ -60,6 +60,24 @@ GIGACHADS = [
     ('https://cdn.discordapp.com/attachments/815312935060242507/896383330881257472/unknown.png', 10)
 ]
 
+DEROGATORY_WORD_STRINGS = [
+    'bad',
+    'cringe',
+    'mid',
+    'overrated',
+    'shit',
+    'awful',
+    'crap',
+    'boring',
+    'terrible',
+    'worst',
+    'annoying'
+]
+
+DEROGATORY_EXPR = re.compile(r'\b(?:{0})\b'.format('|'.join(DEROGATORY_WORD_STRINGS)))
+
+LIN_FILE = ("FILE LOCATION", "SIZE")
+
 
 # Cog containing specific commands/features for the #off-topic channel.
 class OffTopicCog(commands.Cog):
@@ -91,6 +109,10 @@ class OffTopicCog(commands.Cog):
             elif 'gigachad' in message.content.lower():
                 ctx = await self.bot.get_context(message)
                 await ctx.reply(random.choices(*zip(*GIGACHADS))[0])
+            #send lin meme when someone talks bad about hamilton or his name
+            elif (("hamilton" in message.content.lower()) or ("lin manuel miranda" in message.content.lower())) and (re.search(DEROGATORY_EXPR, message.content)):
+                ctx = await self.bot.get_context(message)
+                await ctx.reply(LIN_FILE) ## Lin manuel miranda meme
 
             if message.channel.id == bot_data.CHANNEL_IDS['off-topic']:
                 if message.content in CHAIN_MESSAGES and not message.author.bot:
