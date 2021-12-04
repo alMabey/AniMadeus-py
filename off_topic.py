@@ -1,7 +1,6 @@
 # Extra commands for #off-topic.
 import bot_data
 
-
 import discord
 from discord.ext import commands
 import re
@@ -20,7 +19,7 @@ NGMI_STRINGS = [
     'uwu'
 ]
 
-NGMI_EXPR = re.compile(r'\b(?:{0})\b'.format('|'.join(NGMI_STRINGS)))
+NGMI_EXPR = re.compile(r'\b(?:{0})\b'.format('|'.join(NGMI_STRINGS)), re.IGNORECASE)
 
 CHAIN_MESSAGES = [
     'https://cdn.discordapp.com/attachments/391359642539917322/838840833192099840/pass_the_needle.gif',
@@ -74,9 +73,9 @@ DEROGATORY_WORD_STRINGS = [
     'annoying'
 ]
 
-DEROGATORY_EXPR = re.compile(r'\b(?:{0})\b'.format('|'.join(DEROGATORY_WORD_STRINGS)))
+DEROGATORY_EXPR = re.compile(r'\b(?:{0})\b'.format('|'.join(DEROGATORY_WORD_STRINGS)), re.IGNORECASE)
 
-LIN_FILE = ("FILE LOCATION", "SIZE")
+LIN_FILE = 'https://i.imgur.com/D217yoj.jpg'
 
 
 # Cog containing specific commands/features for the #off-topic channel.
@@ -87,41 +86,47 @@ class OffTopicCog(commands.Cog):
     # Event listener for off-topic messages.
     #
     # Used for Porkying.
-    # > ok so whenever waifu, figure, simp, ship, nitro, handhold, japan are mentioned, the bot must reply ngmi
+    # > ok so whenever waifu, figure, simp, ship, nitro, handhold, japan are mentioned, the bot must reply ngmi.
     # t. High Priest of Eris
     @commands.Cog.listener('on_message')
     async def check_message(self, message):
-        """
-        Checks each message in off-topic and responds if condition met. Bot cannot respond to itself. Any number of
-        responses can be triggered by a single message if multiple conditions are met.
-        Conditions:
-        ngmi token in message -> bot tells author that they are ngmi
-        OR
-        'gigachad' in message -> bot posts a random gigachad from GIGACHADS
-        message is a link in the list of CHAIN_MESSAGES -> bot reposts the link
-        :tf: in message or 'we do' and 'troll' in message -> bot posts a random trollface from TROLLFACES
-        """
         if message.channel.id == bot_data.CHANNEL_IDS['off-topic'] and not message.author.bot:
-            # note that a message is either ngmi or gigachad, cannot be both
+            # NGMI or Gigachad reply
+            #
+            # Author: Priam
+            #
+            # Note that a message is either ngmi or gigachad, cannot be both
             if re.search(NGMI_EXPR, message.content):
                 ctx = await self.bot.get_context(message)
                 await ctx.reply('ngmi, {0}'.format(message.author.mention))
             elif 'gigachad' in message.content.lower():
                 ctx = await self.bot.get_context(message)
                 await ctx.reply(random.choices(*zip(*GIGACHADS))[0])
-            #send lin meme when someone talks bad about hamilton or his name
+
+            # Hamilton Meme reply
+            #
+            # Author: Maybe
             elif (("hamilton" in message.content.lower()) or ("lin manuel miranda" in message.content.lower())) and (re.search(DEROGATORY_EXPR, message.content)):
                 ctx = await self.bot.get_context(message)
-                await ctx.reply(LIN_FILE) ## Lin manuel miranda meme
+                await ctx.reply(LIN_FILE)
 
+            # Chain Message reply
+            #
+            # Author: Danalite
             if message.channel.id == bot_data.CHANNEL_IDS['off-topic']:
                 if message.content in CHAIN_MESSAGES and not message.author.bot:
                     await message.channel.send(message.content)
+
+            # Troll Face reply
+            #
+            # Author: Priam
             if ':tf:' in message.content.lower() or \
                     ('we do' in message.content.lower() and 'troll' in message.content.lower()):
                 await message.channel.send(random.choices(*zip(*TROLLFACES))[0])
 
     # Bravo Nolan command.
+    #
+    # Author: Danalite
     #
     # Quotes kino.
     @commands.command(pass_context=True)
