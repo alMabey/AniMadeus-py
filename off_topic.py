@@ -61,6 +61,23 @@ GIGACHADS = [
 ]
 
 
+DEROGATORY_WORDS_STRINGS = [
+    'bad',
+    'mid',
+    'shit',
+    'overrated',
+    'terrible',
+    'okay',
+    'meh',
+    'awful',
+    'crap',
+    'cringe',
+    'boring'
+]
+DEROGATORY_EXPR = re.compile(r'\b(?:{0})\b'.format('|'.join(DEROGATORY_WORDS_STRINGS)))
+
+LIN_PHOTO = ("FILE LOCATION", "SIZE")
+
 # Cog containing specific commands/features for the #off-topic channel.
 class OffTopicCog(commands.Cog):
     def __init__(self, bot):
@@ -91,6 +108,9 @@ class OffTopicCog(commands.Cog):
             elif 'gigachad' in message.content.lower():
                 ctx = await self.bot.get_context(message)
                 await ctx.reply(random.choices(*zip(*GIGACHADS))[0])
+            elif (("hamilton" in message.content.lower()) or ("lin manuel miranda" in message.content.lower())) and (re.search(DEROGATORY_EXPR, message.content)):
+                ctx = await self.bot.get_context(message)
+                await ctx.reply(LIN_PHOTO) 
 
             if message.channel.id == bot_data.CHANNEL_IDS['off-topic']:
                 if message.content in CHAIN_MESSAGES and not message.author.bot:
