@@ -124,6 +124,13 @@ class OffTopicCog(commands.Cog):
             elif 'gigachad' in message.content.lower():
                 ctx = await self.bot.get_context(message)
                 await ctx.reply(random.choices(*zip(*GIGACHADS))[0])
+            
+            # Makes bot call Mabey based when he says something is bad
+            #
+            # Author: Mabey
+            elif (message.author.id == 917019452095234058 or message.author.id == "917019452095234058") and (re.search(DEROGATORY_DESCRIPTION_EXPR, message.content)):
+                ctx = await self.bot.get_context(message)
+                await ctx.reply("based")
 
             # Hamilton Meme reply
             #
@@ -132,13 +139,6 @@ class OffTopicCog(commands.Cog):
                 ctx = await self.bot.get_context(message)
                 await ctx.reply(LIN_FILE)
                 
-            # Makes bot call Mabey based when he says something is bad
-            #
-            # Author: Mabey
-            if (message.author.id == 917019452095234058 or message.author.id == "917019452095234058") and (re.search(DEROGATORY_DESCRIPTION_EXPR, message.content)):
-                ctx = await self.bot.get_context(message)
-                await ctx.reply("based")
-
             # Chain Message reply
             #
             # Author: Danalite
