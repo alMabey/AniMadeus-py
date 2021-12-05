@@ -70,12 +70,34 @@ DEROGATORY_WORD_STRINGS = [
     'boring',
     'terrible',
     'worst',
-    'annoying'
+    'annoying',
+    'poopy',
+    'kuso',
+    'shite',
+    'unfunny',
+    'dull',
+    'mind-numbing',
+    'poor'
 ]
 
 DEROGATORY_EXPR = re.compile(r'\b(?:{0})\b'.format('|'.join(DEROGATORY_WORD_STRINGS)), re.IGNORECASE)
 
 LIN_FILE = 'https://i.imgur.com/D217yoj.jpg'
+
+
+################################### make an expression of the derogatory words plus "is" or "are", to run against messages
+
+DEROGATORY_DESCRIPTIONS = []
+
+for word in DEROGATORY_WORD_STRINGS:
+    is_concatenated = "is " + word
+    are_concatenated = "are " + word
+    DEROGATORY_DESCRIPTIONS.append(is_concatenated)
+    DEROGATORY_DESCRIPTIONS.append(are_concatenated)
+
+DEROGATORY_DESCRIPTION_EXPR = re.compile(r'\b(?:{0})\b'.format('|'.join(DEROGATORY_DESCRIPTIONS)), re.IGNORECASE)
+
+###################################
 
 
 # Cog containing specific commands/features for the #off-topic channel.
@@ -105,10 +127,17 @@ class OffTopicCog(commands.Cog):
 
             # Hamilton Meme reply
             #
-            # Author: Maybe
+            # Author: Mabey
             elif (("hamilton" in message.content.lower()) or ("lin manuel miranda" in message.content.lower())) and (re.search(DEROGATORY_EXPR, message.content)):
                 ctx = await self.bot.get_context(message)
                 await ctx.reply(LIN_FILE)
+                
+            # Makes bot call Mabey based when he says something is bad
+            #
+            # Author: Mabey
+            if (message.author.id == 917019452095234058 or message.author.id == "917019452095234058") and (re.search(DEROGATORY_DESCRIPTION_EXPR, message.content)):
+                ctx = await self.bot.get_context(message)
+                await ctx.reply("based")
 
             # Chain Message reply
             #
