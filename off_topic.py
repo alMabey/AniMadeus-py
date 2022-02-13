@@ -76,6 +76,7 @@ DEROGATORY_WORD_STRINGS = [
 DEROGATORY_EXPR = re.compile(r'\b(?:{0})\b'.format('|'.join(DEROGATORY_WORD_STRINGS)), re.IGNORECASE)
 
 LIN_FILE = 'https://i.imgur.com/D217yoj.jpg'
+kazuCry = 'https://imgur.com/a/qwv8tkx'
 
 
 # Cog containing specific commands/features for the #off-topic channel.
@@ -123,12 +124,18 @@ class OffTopicCog(commands.Cog):
             if ':tf:' in message.content.lower() or \
                     ('we do' in message.content.lower() and 'troll' in message.content.lower()):
                 await message.channel.send(random.choices(*zip(*TROLLFACES))[0])
+                
+               
         elif not message.author.bot:
             # Special February addition
             if ('no gf' in message.content.lower()):
                 ctx = await self.bot.get_context(message)
                 await ctx.reply('No! Bad! https://i.imgur.com/PLYtGqI.jpg')
-
+            if ('valentines' in message.content.lower()) or ('valentine' in message.content.lower()):
+                ctx = await self.bot.get_context(message)
+                await ctx.reply(kazuCry)
+                
+                
     # Bravo Nolan command.
     #
     # Author: Danalite
