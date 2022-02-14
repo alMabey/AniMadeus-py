@@ -131,6 +131,9 @@ class OffTopicCog(commands.Cog):
             if ('no gf' in message.content.lower() or 'no bf' in message.content.lower()):
                 ctx = await self.bot.get_context(message)
                 await ctx.reply('No! Bad! https://i.imgur.com/PLYtGqI.jpg')
+            elif ('no' in message.content.lower()) and (('gf' in message.content.lower()) or ('bf in message.content.lower())):
+                ctx = await self.bot.get_context(message)
+                await ctx.reply('No! Bad! https://i.imgur.com/PLYtGqI.jpg')                                                                       
             if ('valentines' in message.content.lower()) or ('valentine' in message.content.lower()):
                 ctx = await self.bot.get_context(message)
                 await ctx.reply(kazuCry)
