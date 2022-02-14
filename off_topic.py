@@ -125,20 +125,6 @@ class OffTopicCog(commands.Cog):
                     ('we do' in message.content.lower() and 'troll' in message.content.lower()):
                 await message.channel.send(random.choices(*zip(*TROLLFACES))[0])
 
-
-        elif not message.author.bot:
-            # Special February addition
-            if ('no gf' in message.content.lower() or 'no bf' in message.content.lower()):
-                ctx = await self.bot.get_context(message)
-                await ctx.reply('No! Bad! https://i.imgur.com/PLYtGqI.jpg')
-            elif ('no' in message.content.lower()) and (('gf' in message.content.lower()) or ('bf' in message.content.lower())):
-                ctx = await self.bot.get_context(message)
-                await ctx.reply('No! Bad! https://i.imgur.com/PLYtGqI.jpg')                                                                       
-            if ('valentines' in message.content.lower()) or ('valentine' in message.content.lower()):
-                ctx = await self.bot.get_context(message)
-                await ctx.reply(kazuCry)
-
-
     # Bravo Nolan command.
     #
     # Author: Danalite
