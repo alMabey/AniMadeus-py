@@ -125,9 +125,10 @@ class OffTopicCog(commands.Cog):
             if ':tf:' in message.content.lower() or \
                     ('we do' in message.content.lower() and 'troll' in message.content.lower()):
                 await message.channel.send(random.choices(*zip(*TROLLFACES))[0])
-        if 'akechi' in message.content.lower():
-            ctx = await self.bot.get_context(message)
-            await ctx.reply(pointing)
+        elif not message.author.bot:
+            if 'akechi' in message.content.lower():
+                ctx = await self.bot.get_context(message)
+                await ctx.reply(pointing)
             
 
     # Bravo Nolan command.
