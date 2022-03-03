@@ -21,6 +21,10 @@ NGMI_STRINGS = [
 
 NGMI_EXPR = re.compile(r'\b(?:{0})\b'.format('|'.join(NGMI_STRINGS)), re.IGNORECASE)
 
+FFXIV_SHILL = 'Have you considered playing the critically acclaimed MMORPG Final Fantasy XIV? With an expanded free trial you can play through the entirety of A Realm Reborn and the award winning Heavensward expansion up to level 60 for free with no restrictions on playtime.'
+
+FFXIV_COUNTER = 0
+
 CHAIN_MESSAGES = [
     'https://cdn.discordapp.com/attachments/391359642539917322/838840833192099840/pass_the_needle.gif',
     'https://cdn.discordapp.com/attachments/391359642539917322/895405101949263952/1564621864696.gif'
@@ -58,6 +62,19 @@ GIGACHADS = [
     ('https://cdn.discordapp.com/attachments/815312935060242507/896383363747811348/unknown.png', 250),
     ('https://cdn.discordapp.com/attachments/815312935060242507/896383330881257472/unknown.png', 10)
 ]
+
+FFXIV_STRINGS = [
+    'ff14',
+    'ffxiv',
+    'thancred',
+    'eorzea',
+    'spookyscary',
+    'omegagamer',
+    'fantasy',
+    'noscea'
+]
+
+FFXIV_EXPR = re.compile(r'\b(?:{0})\b'.format('|'.join(FFXIV_STRINGS)), re.IGNORECASE)
 
 DEROGATORY_WORD_STRINGS = [
     'bad',
@@ -129,6 +146,16 @@ class OffTopicCog(commands.Cog):
             if 'akechi' in message.content.lower():
                 ctx = await self.bot.get_context(message)
                 await ctx.reply(pointing)
+                
+            if re.search(FFXIV_EXPR, message.content):        
+                if FFXIV_COUNTER == 0:
+                    ctx = await self.bot.get_context(message)
+                    await ctx.reply(FFXIV_SHILL)
+                    
+                FFXIV_COUNTER += 1
+                if FFXIV_COUTNER >= 10:
+                    FFXIV_COUNTER = 0
+                
             
 
     # Bravo Nolan command.
